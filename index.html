@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-page-type="static">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spencience - Snake Game</title>
+<meta name="description" content="Play a fun snake game and learn about Spencience">
+<meta name="keywords" content="Spencience, Snake Game, Phaser">
+<meta property="og:title" content="Spencience - Snake Game">
+<meta property="og:description" content="Play a fun snake game and learn about Spencience">
+<meta property="og:image" content="https://example.com/spencience-logo.svg">
+<meta property="twitter:title" content="Spencience - Snake Game">
+<meta property="twitter:description" content="Play a fun snake game and learn about Spencience">
+<meta property="twitter:image" content="https://example.com/spencience-logo.svg">
+<link rel="icon" type="image/svg+xml" href="https://example.com/spencience-logo.svg">
+<link rel="manifest" href="https://example.com/manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" integrity="sha512-wneaSuAKYWb6M9UhCSST2KvIq09flwnh6ztKnj0UfEmkDjoGBjp6rxfZCO3OWSd8MnTGQPNcKocqKKb46mJHmQ==" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js" integrity="sha512-ZIM1fAqvArjyCW4GlDyYbXD+ebE7nKvCO3KZSRSW0TMRkViD6TmK3Acm4sBmU5mZZZJHyxRip2yXzQXhVlcArQ==" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-100 flex flex-col h-screen">
+<header class="bg-white shadow">
+<nav class="container mx-auto px-4 py-2 flex justify-between">
+<a href="#" class="text-lg font-bold text-gray-900">Spencience</a>
+<ul class="flex items-center space-x-2">
+<li><a href="#" class="text-gray-600 hover:text-gray-900">Home</a></li>
+<li><a href="#" class="text-gray-600 hover:text-gray-900">About</a></li>
+<li><a href="#" class="text-gray-600 hover:text-gray-900">Contact</a></li>
+</ul>
+</nav>
+</header>
+<main class="flex-1 container mx-auto p-4">
+<section class="bg-white shadow p-4 mb-4">
+<h2 class="text-lg font-bold text-gray-900 mb-2">Snake Game</h2>
+<div id="game" class="w-full h-64 bg-gray-200 rounded"></div>
+</section>
+<section class="bg-white shadow p-4 mb-4">
+<h2 class="text-lg font-bold text-gray-900 mb-2">About Spencience</h2>
+<p class="text-gray-600">Spencience is a cryptocurrency that is all about having fun and learning.</p>
+</section>
+</main>
+<footer class="bg-gray-200 text-gray-600 text-center p-4">
+        &copy; 2023 Spencience
+    </footer>
+<script>
+</script>
+<script>
+                // Initialize Phaser
+                var config = {
+                    type: Phaser.AUTO,
+                    width: 800,
+                    height: 600,
+                    physics: {
+                        default: 'arcade',
+                        arcade: {
+                            gravity: { y: 200 }
+                        }
+                    },
+                    scene: {
+                        preload: preload,
+                        create: create,
+                        update: update
+                    }
+                };
+
+                var game = new Phaser.Game(config);
+
+                function preload() {
+                    this.load.image('snake', 'https://example.com/snake.png');
+                    this.load.image('food', 'https://example.com/food.png');
+                }
+
+                function create() {
+                    this.add.image(400, 300, 'snake');
+
+                    var snake = this.physics.add.sprite(100, 100, 'snake');
+                    snake.setVelocity(100, 100);
+                    snake.setBounce(0.2, 0.2);
+                    snake.setCollideWorldBounds(true);
+
+                    this.anims.create({
+                        key: 'left',
+                        frames: this.anims.generateFrameNumbers('snake', { start: 0, end: 3 }),
+                        frameRate: 10,
+                        repeat: -1
+                    });
+
+                    this.anims.create({
+                        key: 'right',
+                        frames: this.anims.generateFrameNumbers('snake', { start: 5, end: 8 }),
+                        frameRate: 10,
+                        repeat: -1
+                    });
+
+                    this.anims.create({
+                        key: 'up',
+                        frames: this.anims.generateFrameNumbers('snake', { start: 10, end: 13 }),
+                        frameRate: 10,
+                        repeat: -1
+                    });
+
+                    this.anims.create({
+                        key: 'down',
+                        frames: this.anims.generateFrameNumbers('snake', { start: 15, end: 18 }),
+                        frameRate: 10,
+                        repeat: -1
+                    });
+
+                    var food = this.physics.add.sprite(300, 300, 'food');
+                    food.setImmovable();
+
+                    this.physics.add.collider(snake, food, eatFood, null, this);
+                }
+
+                function update(time, delta) {
+                    var cursors = this.input.keyboard.createCursorKeys();
+
+                    if (cursors.left.isDown) {
+                        snake.setVelocityX(-100);
+                        snake.anims.play('left', true);
+                    } else if (cursors.right.isDown) {
+                        snake.setVelocityX(100);
+                        snake.anims.play('right', true);
+                    } else if (cursors.up.isDown) {
+                        snake.setVelocityY(-100);
+                        snake.anims.play('up', true);
+                    } else if (cursors.down.isDown) {
+                        snake.setVelocityY(100);
+                        snake.anims.play('down', true);
+                    } else {
+                        snake.anims.stop();
+                        snake.setVelocityX(0);
+                        snake.setVelocityY(0);
+                    }
+                }
+
+                function eatFood(snake, food) {
+                    food.disableBody(true, true);
+                    snake.clearTint();
+                    snake.setTint(0x00ff00);
+                }
+            </script>
+</main>
+</body>
+</html>
